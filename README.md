@@ -9,6 +9,18 @@ Todo:
 Some stuff! :+1:
 
 ```haskell
+-- Getting next elements of the polynomial series
+continue :: [Integer] -> [Integer]
+continue xs = map last $ iterate nextD differences
+         where
+         differences = nextD $ genDifs xs
+
+-- Α list of sums of squares
+-- ∑(∑n²) = 1² + (1² + 2²) + (1² + 2² + 3²) + ...
+--        = 1 + 5 + 14 + 30 + 55...
+-- λ> take 10 (continue [1, 5, 14, 30, 55])
+-- [91,140,204,285,385,506,650,819,1015,1240]
+
 -- Newton's square root method
 newton :: Float -> Float
 newton x = until isGoodEnough improve x
