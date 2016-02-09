@@ -2,7 +2,8 @@
 
 Todo:
 
- * Stuff involving more of Monads & MTL
+ * Stuff involving more of Math and Logic as well as Algorithms
+ * Later some stuff on Monads & MTL
  * Stuff on Network & Systems programming
  * Stuff for calling Web API and other RESTful services using Haskell
 
