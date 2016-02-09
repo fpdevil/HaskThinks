@@ -96,9 +96,16 @@ taxiCabSet n
                   where
                   f = L.nub . concatMap quads
 
--- TaxiCab number and set
+-- Nth TaxiCab number and set
 taxiCab :: Int -> (Int, [Int])
 taxiCab n = (\(a,b,c,d) -> (a^3+b^3, [a,b,c,d])) $ taxiCabSet n
+
+-- λ> taxiCab 1
+-- (1729,[1,12,9,10])
+-- λ> taxiCab 2
+-- (4104,[2,16,9,15])
+-- λ> taxiCab 3
+-- (13832,[2,24,18,20])
 
 ----------------------------------------------------------------
 -- PRIMALITY TESTS
@@ -136,7 +143,7 @@ ldf k n | divides k n = k
         | otherwise   = ldf (k+1) n
 
 -- ld(n)
--- ld looks for a prime divisor of n by checking k|n for all k with
+-- ld looks for a prime divisor of n by checking n/k for all k with
 -- 2 <= k <= √n
 ld :: (Integral a) => a -> a
 ld = ldf 2
@@ -219,12 +226,13 @@ delete x (y : ys) = if x == y
 -- Implementing a Powerlist on the lines of Power Set
 powerlist :: [a] -> [[a]]
 powerlist [] = [[]]
+powerlist [x] = [[], [x]]
 powerlist (x : xs) = powerlist xs ++ map (x : ) (powerlist xs)
 
 -- λ> powerlist [1,2,3]
 -- [[],[3],[2],[2,3],[1],[1,3],[1,2],[1,2,3]]
 
--- For all n ∈ N, the set of pairs {(a,b) | a,b ∈ N,ab = n,a <= b}
+-- For all n ∈ N, the set of pairs {(a,b) | a,b ∈ N,a*b = n,a <= b}
 -- is a relation on N. This relation gives all the divisor pairs of n
 divisorPairs :: Integer -> [(Integer, Integer)]
 divisorPairs n = [(d, quot n d) | d <- [1 .. x], n `rem` d == 0]
@@ -246,15 +254,27 @@ properDivs n = init (divs n)
 isPerfect :: Integer -> Bool
 isPerfect n = sum (properDivs n) == n
 
+-- Perfect numbers under 1000
+-- λ> filter isPerfect [1..1000]
+-- [1,6,28,496]
+
 -- Modulo
+{--
+If we have A mod B and we increase A by a multiple of B, we will end up in the same spot, i.e.
+A mod B = (A + K*B) mod B for any integer K.
+ a is congruent to b modulo n = a ≡ b mod n
+a ≡ b mod n if a and b leave the same remainder if divided by n
+a ≡ b mod n if n divides a−b
+-}
 modulo :: Integer -> Integer -> Integer -> Bool
 modulo a b = divides (a - b)
 -- λ> filter (modulo 10 7) [-10 .. 10]
 -- [-9,-6,-3,0,3,6,9]
 
--- Integer Partitions of n ∈ N+ are lists of non-zero natural
--- numbers which all add upto the number n exactly
 {--
+Integer Partitions of n ∈ N+ are lists of non-zero natural
+numbers which all add upto the number n exactly
+
 Algorithm for generating the integer partitions in lexicographically
 increasing order. The integer partitions of n correspond to the sizes 
 of the set partitions of a set A with |A| = n.
@@ -278,6 +298,8 @@ expand :: ComPartition -> Partition
 expand (0, p) = p
 expand (n, p) = 1 : expand (n - 1, p)
 
+-- For generating the next partition from (k, xs) we may assume xs to be non-empty
+-- and that its elements are listed in increasing order.
 nextPartition :: ComPartition -> ComPartition
 nextPartition (a, x : xs) = pack (x - 1) (a + x, xs)
 
@@ -296,3 +318,4 @@ partition n
     | n < 1     = error "Negative Argument"
     | n == 1    = [[1]]
     | otherwise = generatePartitions (0, [n])
+
